@@ -6,35 +6,53 @@
         <title>pdf2html</title>
     </head>
     <body>
-        <img
+        <div
             id="loading"
-            alt="Loading"
-            src="https://media.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif"
-            style="width:200px;height:200px;"
-        />
+            style="
+                display:none;
+                justify-content:center;
+                align-items:center;
+            "
+        >
+            <img
+                alt="Loading"
+                src="https://media.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif"
+                style="width:200px;height:200px;"
+            />
+        </div>
         <p id="text"></p>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
         <script>
-            const pdfjsLib = window['pdfjs-dist/build/pdf'];
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
-
             const run = async () => {
                 const url = decodeURIComponent(
                     new URLSearchParams(window.location.search).get('q')
                 );
+
+                let pdfText = localStorage.getItem(url);
+                if (pdfText) {
+                    document.title = url;
+                    document.querySelector('#text').innerHTML = pdfText;
+                    return;
+                }
+
+                document.querySelector('#loading').style.height = `${window.innerHeight}px`;
+                document.querySelector('#loading').style.display = 'flex';
+
+                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+
                 const pdf = await pdfjsLib.getDocument(url).promise;
-                const maxPages = pdf.numPages;
                 const pageTextPromises = [];
-                for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
+                for (let pageNo = 1; pageNo <= pdf.numPages; pageNo += 1) {
                     const page = await pdf.getPage(pageNo);
                     const tokenizedText = await page.getTextContent();
                     const pageText = tokenizedText.items.map(token => token.str).join(" ");
                     pageTextPromises.push(pageText);
                 }
-                const pageTexts = await Promise.all(pageTextPromises);
-                document.querySelector('#loading').style.display = 'none';
-                document.querySelector('#text').innerHTML = pageTexts.join(" ");
+                pdfText = (await Promise.all(pageTextPromises)).join(' ');
+                window.localStorage.setItem(url, pdfText);
+                window.location.reload();
             };
 
             run();
