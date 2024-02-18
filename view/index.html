@@ -6,25 +6,24 @@
         <title>pdf2html</title>
     </head>
     <body>
+        <img
+            id="loading"
+            alt="Loading"
+            src="https://media.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif"
+            style="width:200px;height:200px;"
+        />
         <p id="text"></p>
 
-        <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module" crossorigin="use-credentials"></script>
-        <script type="module" crossorigin="use-credentials">
-            const log = (msg) => {
-                document.querySelector('#text').innerHTML += msg + '<br />';
-            }
-
-            var { pdfjsLib } = globalThis;
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
-
-            log('Loaded pdf.js library')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+        <script>
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
 
             const run = async () => {
                 const url = decodeURIComponent(
                     new URLSearchParams(window.location.search).get('q')
                 );
                 const pdf = await pdfjsLib.getDocument(url).promise;
-                log('Loaded pdf from url');
                 const maxPages = pdf.numPages;
                 const pageTextPromises = [];
                 for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
@@ -32,18 +31,13 @@
                     const tokenizedText = await page.getTextContent();
                     const pageText = tokenizedText.items.map(token => token.str).join(" ");
                     pageTextPromises.push(pageText);
-                    log(`Loaded page ${pageNo}`);
                 }
                 const pageTexts = await Promise.all(pageTextPromises);
-                log(pageTexts.join(" "));
+                document.querySelector('#loading').style.display = 'none';
+                document.querySelector('#text').innerHTML = pageTexts.join(" ");
             };
 
-            try {
-                await run();
-            } catch (error) {
-                document.querySelector('#text').style.color = '#ff3333';
-                log(error);
-            }
+            run();
         </script>
     </body>
 </html>
