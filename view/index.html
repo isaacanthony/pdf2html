@@ -13,6 +13,8 @@
             style="width:200px;height:200px;"
         />
         <p id="text"></p>
+        <p id="error" style="color:#ff3333;"></p>
+
         <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
         <script type="module">
             var { pdfjsLib } = globalThis;
@@ -32,11 +34,15 @@
                     pageTextPromises.push(pageText);
                 }
                 const pageTexts = await Promise.all(pageTextPromises);
-                document.querySelector('#loading').style.display = 'none';
                 document.querySelector('#text').innerHTML = pageTexts.join(" ");
             };
 
-            run();
+            try {
+                await run();
+            } catch (error) {
+                document.querySelector('#error').innerHTML = error;
+            }
+            document.querySelector('#loading').style.display = 'none';
         </script>
     </body>
 </html>
