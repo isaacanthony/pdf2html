@@ -5,10 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>pdf2html</title>
     </head>
-    <body>
-        <input type="text" />
-        <button onclick="search()">Search</button>
+    <body onresize="resize()">
+        <div
+            id="container"
+            style="
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                gap:10px;
+            "
+        >
+            <input
+                type="text"
+                style="
+                    border-radius:0.25rem;
+                    color:#3377ff;
+                    font-size:1.5rem;
+                    padding:1rem;
+                    width:80%;
+                "
+            />
+            <button
+                onclick="search()"
+                style="
+                    cursor:pointer;
+                    padding:1rem;
+                    font-size:1.5rem;
+                "
+            >
+                &#128269;
+            </button>
+        </div>
+
         <script>
+            const resize = () => {
+                document.querySelector('#container').style.height =`${window.innerHeight}px`;
+            };
+
             const search = () => {
                 const url = document.querySelector('input').value;
                 if (!url) {
@@ -16,6 +49,8 @@
                 }
                 window.location = `${window.location.href}view?q=${encodeURIComponent(url)}`;
             };
+
+            resize();
         </script>
     </body>
 </html>
