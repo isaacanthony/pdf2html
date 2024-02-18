@@ -8,8 +8,8 @@
     <body>
         <p id="text"></p>
 
-        <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
-        <script type="module">
+        <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module" crossorigin="use-credentials"></script>
+        <script type="module" crossorigin="use-credentials">
             const log = (msg) => {
                 document.querySelector('#text').innerHTML += msg + '<br />';
             }
