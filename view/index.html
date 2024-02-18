@@ -23,7 +23,6 @@
                 const url = decodeURIComponent(
                     new URLSearchParams(window.location.search).get('q')
                 );
-                document.title = url;
                 const pdf = await pdfjsLib.getDocument(url).promise;
                 const maxPages = pdf.numPages;
                 const pageTextPromises = [];
