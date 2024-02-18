@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>pdf2html</title>
+    </head>
+    <body>
+        <img
+            id="loading"
+            alt="Loading"
+            src="https://media.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif"
+            style="width:200px;height:200px;"
+        />
+        <p id="text"></p>
+        <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
+        <script type="module">
+            var { pdfjsLib } = globalThis;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
+
+            const run = async () => {
+                const url = decodeURIComponent(
+                    new URLSearchParams(window.location.search).get('q')
+                );
+                const pdf = await pdfjsLib.getDocument(url).promise;
+                const maxPages = pdf.numPages;
+                const pageTextPromises = [];
+                for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
+                    const page = await pdf.getPage(pageNo);
+                    const tokenizedText = await page.getTextContent();
+                    const pageText = tokenizedText.items.map(token => token.str).join(" ");
+                    pageTextPromises.push(pageText);
+                }
+                const pageTexts = await Promise.all(pageTextPromises);
+                document.querySelector('#loading').style.display = 'none';
+                document.querySelector('#text').innerHTML = pageTexts.join(" ");
+            };
+
+            run();
+        </script>
+    </body>
+</html>

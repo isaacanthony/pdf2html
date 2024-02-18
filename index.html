@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>pdf2html</title>
+    </head>
+    <body>
+        <input type="text" />
+        <button onclick="search()">Search</button>
+        <script>
+            const search = () => {
+                const url = document.querySelector('input').value;
+                if (!url) {
+                    return;
+                }
+                window.location = `${window.location.origin}/view?q=${encodeURIComponent(url)}`;
+            };
+        </script>
+    </body>
+</html>
