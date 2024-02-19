@@ -20,6 +20,7 @@
                 style="width:200px;height:200px;"
             />
         </div>
+        <p><a id="url" href="#"></a></p>
         <p id="text"></p>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
@@ -31,7 +32,9 @@
 
                 let pdfText = localStorage.getItem(url);
                 if (pdfText) {
-                    document.title = '';
+                    document.title = pdfText.substring(0, 32);
+                    document.querySelector('#url').href = url;
+                    document.querySelector('#url').innerHTML = url;
                     document.querySelector('#text').innerHTML = pdfText;
                     return;
                 }
