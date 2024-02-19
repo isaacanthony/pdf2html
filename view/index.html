@@ -32,7 +32,7 @@
 
                 let pdfText = localStorage.getItem(url);
                 if (pdfText) {
-                    document.title = pdfText.substring(0, 32);
+                    document.title = pdfText.substring(0, 32) + '...';
                     document.querySelector('#url').href = url;
                     document.querySelector('#url').innerHTML = url;
                     document.querySelector('#text').innerHTML = pdfText;
