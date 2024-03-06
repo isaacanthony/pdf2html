@@ -20,11 +20,41 @@
                 style="width:200px;height:200px;"
             />
         </div>
+        <button style="font-size: 2rem; padding:0.5rem;" onclick="playTts()">&gt;</button>
+        <button style="font-size: 2rem; padding:0.5rem;" onclick="pauseTts()">||</button>
         <p><a id="url" href="#"></a></p>
-        <p id="text"></p>
+        <p id="text-wrapper"></p>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
         <script>
+            const synth = window.speechSynthesis;
+
+            const playTts = () => {
+                if (synth.paused) {
+                    synth.resume();
+                    return;
+                }
+
+                let text = '';
+                document.querySelectorAll('.text').forEach(el => text += el.innerHTML + ' ');
+                const utterThis = new SpeechSynthesisUtterance(text);
+
+                utterThis.onpause = (event) => {
+                    const char = event.utterance.text.charAt(event.charIndex);
+                    console.log(
+                        `Speech paused at character ${event.charIndex} of "${event.utterance.text}", which is "${char}".`,
+                    );
+                };
+
+                synth.speak(utterThis);
+
+
+            };
+
+            const pauseTts = () => {
+                if (!synth.paused) synth.pause();
+            };
+
             const run = async () => {
                 const url = decodeURIComponent(
                     new URLSearchParams(window.location.search).get('q')
@@ -32,10 +62,10 @@
 
                 let pdfText = localStorage.getItem(url);
                 if (pdfText) {
-                    document.title = pdfText.substring(0, 64).split(' ').slice(2).join(' ') + '...';
+                    document.title = pdfText.substring(10, 64).split(' ').slice(2).join(' ') + '...';
                     document.querySelector('#url').href = url;
                     document.querySelector('#url').innerHTML = url;
-                    document.querySelector('#text').innerHTML = pdfText;
+                    document.querySelector('#text-wrapper').innerHTML = pdfText;
                     return;
                 }
 
@@ -50,7 +80,7 @@
                 for (let pageNo = 1; pageNo <= pdf.numPages; pageNo += 1) {
                     const page = await pdf.getPage(pageNo);
                     const tokenizedText = await page.getTextContent();
-                    const pageText = `<h2>Page ${pageNo}</h2> ` + tokenizedText.items.map(token => token.str).join(' ');
+                    const pageText = `<h2>Page ${pageNo}</h2><p class="text">` + tokenizedText.items.map(token => token.str).join(' ') + '</p>';
                     pageTextPromises.push(pageText);
                 }
                 pdfText = (await Promise.all(pageTextPromises)).join(' ').replaceAll('- ', '');
